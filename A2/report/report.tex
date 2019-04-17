@@ -1,0 +1,126 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{listings}
+\usepackage{booktabs}
+
+\oddsidemargin 0mm
+\evensidemargin 0mm
+\textwidth 160mm
+\textheight 200mm
+
+\pagestyle {plain}
+\pagenumbering{arabic}
+
+\newcounter{stepnum}
+
+\title{Assignment 2 Solution}
+\author{Donisius Wigie}
+\date{\today}
+
+\begin {document}
+
+\maketitle
+
+The modules created are to allocate first year engineering students into their second year programs based on their top choices and gpa. The problem is the same as in assignment 1 but the approach taken is much different. We were given formal specifications as opposed to the natural language specifications given in assignment 1.
+
+\section{Testing of the Original Program}
+
+The first module I began testing was the DCapALst module. After creating all my test cases for this module, my module one test for the add method. When I was first creating the method, I had misunderstood the exception. The exception is if the department already existed, then to raise an exception. The way I interpreted that in the beginning was to raise an exception when something other than an integer value was given as the second argument. I caught this while testing for the exception for the add method and changed my code immediately. My test cases for the elm function were to see if they returned false if the department did not exist and true if it did. Before I tested elm for a department which already existed, I needed to test the add function to make sure it worked properly so that I would be able to use the add function to test the elm function. I followed this principle as I made my test cases for other methods where I test the simplest methods first before using those simple methods to test more complicated methods.
+The second module I tested was my SeqADT module. I began my testing the constructor and the best way I felt to do that was to see if the type instantiated was of type SeqADT using the issinstance method. While creating my test case for the exception specified for the next() method, I realized that my next method did not raise an exception when the index passed the bounds, it stopped itself before it was able to raise an exception. I changed my code to match the specifications. I tested start by making sure when it is called the index goes back to 0 and I tested end to see if it would return true if it was at the end of the list and false if not.
+Finally, I tested SALst. I began with testing the remove function to make sure the exception gets raised when you try to remove something that isn’t in the list. I then tested the elm method using the normal cases (true if something exists false if not) and used the elm method to test the add function to make sure when you add something it exists in the list. I tested the info method to make sure the correct type was being returned (SInfoT) using the issinstance method and that the info stored in SInfoT was correct by comparing them to the expected information. I tested the sort method to make sure a sample array was sorted and would return the correct list of arrays according to 2 different lambda functions passed in. I tested the average function by calling the method and comparing the returned value to the expected result and I tested the exception by causing a division by zero to occur. I tested the allocate function by first seeing if the exception would be raised if there were no departments available. Then I provided all the expected information and tested allocate by comparing the students allocated into the departments with the expected students allocated to the departments. I then tested allocate to see if it would raise an exception when a student does not get allocated into any program.
+
+
+\section{Results of Testing Partner's Code}
+
+My partner’s code passed every single one of my test cases. I first thought it was strange for all the test cases to pass because for the first assignment my partner passed only 7 out of the 18 tests. I expected more test cases to pass for this assignment since the specifications were very strict, but I did not expect all the test cases to pass. After closer inspection of my partner’s code it is very clear why it passed every test case. I created by test case not by looking back at the code I wrote, but by looking at the specifications provided for each of the methods we were supposed to test from the assignment document. My partner’s code very closely followed the specifications and was able to raise exceptions for the right conditions. They also implemented their SALst and DCapALst as a list when the module is instantiated. Our code looks very similar since we both seemed to follow the specifications very closely, and this showed with the passing of all my test cases. This is a contrast from the first assignment where my partner’s code looked nothing like mine and we both made drastically different assumptions and therefore was hard to anticipate how to make test cases for another person’s code. For this assignment, we were not able to make nearly as much assumptions and therefore was more likely that the test cases created would work for other people’s code as well.
+
+\section{Critique of Given Design Specification}
+
+I grew an appreciation for the design as everything was so modularized. The methods in the classes worked together perfectly and since it was so modularized, when something went wrong it was very easy to isolate the problem. Furthermore, I did not need to worry about creating bigger problems in other parts of the program since the problem was isolated. However, as much as I enjoy modularization and appreciate its benefits, I do believe that too much modularization can be redundant. I felt like some parts of the specifications were redundant such as the next() and end() methods in the SeqADT module. I think that it would be better to have end built into next to that it stops when it is at the end instead of raising an exception. It can be confusing when trying to use the two together to make sure it isn’t at the end by calling the end method and then calling the next method. The user might find that redundant and confusing. I also did not understand the use of the get\_gpa method in the SALst module. Why use a method to get the gpa when you are able to do it easily without a method with .gpa on a SInfoT type.
+
+\section{Answers}
+
+\begin{enumerate}
+
+\item The natural language specification of A1 were very different than the formal specification of A2. With the natural language specification, there were many assumptions that needed to be made. I needed to make assumptions on when exceptions should be raised. I also needed to assumptions on how to deal with certain conditions and events. Some of these assumptions include dealing with the event that a student does not get allocated into any department, how to deal with/prevent a DivisionByZero exception, how to deal with nonsensical inputs, how to deal with the boundary cases, and many others. To summarize, with the natural language specification of A1, there were many assumptions I needed to make as the specification did not include how certain conditions or sequence of events should be dealt with. An advantage to using natural language specifications would be that it is much easier than formal specification to understand. The simplicity comes from using English to communicate the specifications so it is easier for the programmer to understand what the specification is asking for. Contrasting the natural language specification with the formal specification of A2, there were very little assumptions to be made as I created the modules for A2. I did not have to make assumptions about when exceptions should be raised because it specifies when they should be raised. The specification provides most assumptions I possibly would make such as in the SALst module. The assumptions given were that SALst.init() is called before any other access program and DCapALst has been populated before allocate() is ran. A disadvantage to using formal specification is that it can be difficult to understand what the specification is asking for. It is difficult to adjust to reading mathematical specifications and it is also more difficult to express what you want the program to do through mathematical specifications rather than natural language.
+
+\item Since the specification makes the assumption that the gpa will be between 0 and 12, I did not include any way to deal with gpa inputs which are not within that range. It is entirely possible for someone to use the program and input a gpa which is less than 0 or greater than 12 which can cause issues in the output of the program when allocate is called. The way I would modify this assumption is to create an exception when the program encounters a gpa which is less than 0 or greater than 12, most likely in the sort() method. When the sort method comes across a student who has a gpa that is below 0 or greater than 12, then the exception should be raised to indicate this. I don’t necessarily need to modify the specification in order to replace a record type with a new ADT since the exception would be raised when sort comes across this but it may be beneficial to go this route. This is because a new ADT to replace one of the record types like SInfoT can be created to catch such exceptions before the data gets put through the rest of the program. This way, potential problems which may arise can be isolated and caught early on.
+
+\item The two modules SALst and DCapALst are very similar in that they both contain the methods add, remove and elm, which have very similar functions. The two functions info(m) from SALst and capacity(d) from DCapALsy also have similar functions since they return information about a member of each respective list. The documentation can be modified to take advantage of these similarities by incorporating just one module containing student information and the department capacities so that the functions can be used to add, remove, see if an element exists and return information about an entry all in one module with one method for each function. This would of course reduce the modularization of the program, but it would also reduce the amount of confusion since two modules wouldn’t have the same functions with the same name. Another way we can take advantage of the similarities is by creating a separate module containing the add, remove, elm and info/capacity methods so that it can be used in the SALst and DCapALst. Doing it this way will increase the level of modularization in the program.
+
+\item In several ways, A2 is more general than A1 because it is able to solve more general problems. For example, in A1 the students each must three top picks and the problem is allocate the students based on those three top picks. In A2, the students are able to have as many picks as possible and the program will allocate the students according to their picks regardless of how many choices they have with the assumption that it isn’t zero choices, since that would raise an exception when allocate is called. Students also do not need to have the same number of choices and the program will still be able to allocate the students. The problem when from allocate the students based off their top three choices to allocate the students based off their top n choices.
+
+\item Since we are representing the list of choices for each student by a custom object, SeqADT instead of a Python list, there are many advantages that come along with this design choice. Using SeqADT to represent the list of choices for each student, we can create built in methods to process the information stored. We created a method which can set the index back to the beginning, a method to return the element which is currently indexed and increment the index, and we have a method which checks to see if the list is at the end. Because of this ability to create built in methods to help process the information it is easier for methods outside of the module to process the information. Furthermore, with this design choice, it is much easier for changes to the number of choices featured in a students top choices to be implemented. This is because we only need to keep checking whether we are at the end of the list or not using the end method and because of this it is easier to create outside methods to accommodate for any changes.
+
+\item Using enums to represent student gender, student info and departments provides several advantages over the string/dictionary representations in A1. Using enums to represent this data means that the data is immutable and will contain more information than their string/dictionary counterparts. For example, we are able to check to see if an object is of type GenT, DeptT, and SInfoT using the isinstance function, and check the type using the type function. It also prevents misspelled field names which can cause several issues such as causing the program to add or remove unintentionally. By using enums, it provides protection against problems with misspelling, capitalization etc.
+
+\end{enumerate}
+
+\newpage
+
+\lstset{language=Python, basicstyle=\tiny, breaklines=true, showspaces=false,
+  showstringspaces=false, breakatwhitespace=true}
+%\lstset{language=C,linewidth=.94\textwidth,xleftmargin=1.1cm}
+
+\def\thesection{\Alph{section}}
+
+\section{Code for StdntAllocTypes.py}
+
+\noindent \lstinputlisting{../src/StdntAllocTypes.py}
+
+\newpage
+
+\section{Code for SeqADT.py}
+
+\noindent \lstinputlisting{../src/SeqADT.py}
+
+\newpage
+
+\section{Code for DCapALst.py}
+
+\noindent \lstinputlisting{../src/DCapALst.py}
+
+\newpage
+
+\section{Code for AALst.py}
+
+\noindent \lstinputlisting{../src/AALst.py}
+
+\newpage
+
+\section{Code for SALst.py}
+
+\noindent \lstinputlisting{../src/SALst.py}
+
+\newpage
+
+\section{Code for Read.py}
+
+\noindent \lstinputlisting{../src/Read.py}
+
+\newpage
+
+\section{Code for Partner's SeqADT.py}
+
+\noindent \lstinputlisting{../partner/SeqADT.py}
+
+\newpage
+
+\section{Code for Partner's DCapALst.py}
+
+\noindent \lstinputlisting{../partner/DCapALst.py}
+
+\newpage
+
+\section{Code for Partner's SALst.py}
+
+\noindent \lstinputlisting{../partner/SALst.py}
+
+\newpage
+
+\section{Code for test\_All.py}
+
+\noindent \lstinputlisting{../src/test_All.py}
+\end {document}

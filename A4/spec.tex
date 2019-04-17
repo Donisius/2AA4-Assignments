@@ -1,0 +1,210 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{hhline}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{multicol}
+
+\oddsidemargin 0mm
+\evensidemargin 0mm
+\textwidth 160mm
+\textheight 200mm
+\renewcommand\baselinestretch{1.0}
+
+\pagestyle {plain}
+\pagenumbering{arabic}
+
+\newcounter{stepnum}
+
+%% Comments
+
+\usepackage{color}
+
+\newif\ifcomments\commentstrue
+
+\ifcomments
+\newcommand{\authornote}[3]{\textcolor{#1}{[#3 ---#2]}}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\else
+\newcommand{\authornote}[3]{}
+\newcommand{\todo}[1]{}
+\fi
+
+\newcommand{\wss}[1]{\authornote{blue}{SS}{#1}}
+
+\title{Assignment 4, Part 1, Specification}
+\author{SFWR ENG 2AA4}
+
+\begin {document}
+
+\maketitle
+
+This specification was created for John Conway's Game of Life. The user interface consists of an ascii text representation of a grid for the game which is modifiable by the user.
+
+\newpage
+
+\section*{Cell Types Module}
+\subsection*{Module}
+CellType
+\subsection*{Uses}
+N/A
+\subsection*{Syntax}
+\subsubsection*{Exported Constants}
+N/A
+\subsubsection*{Exported Types}
+$ StateT $ = {Dead, Alive}\\
+$ CellT $ = tuple of (s : StateT)
+
+\subsubsection*{Exported Access Programs}
+None
+\subsection*{Semantics}
+\subsubsection*{State Variables}
+None
+\subsubsection*{State Invariant}
+None
+
+\newpage
+
+\section* {Grid2D Module}
+
+\subsection*{Template Module}
+
+Grid2D
+
+\subsection* {Uses}
+
+CellType
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+Grid2D = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+Grid2D & fileName:string & ~ & invalid\_argument\\
+\hline
+viewGrid & fileName:string & ~ & invalid\_argument\\
+\hline
+evolveGrid & ~ & ~ & ~\\
+\hline
+viewGenerations & $ \mathbb{N} $ & ~ & invalid\_argument\\
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection*{Environment Variables}
+
+$initialState$: File containing the graphical representation of the initial state of the Grid.
+\noindent{$nextState$: File containing the graphical representation of the state after any iteration of the program.}
+
+\subsubsection* {State Variables}
+
+$grid$: seq of CellT
+
+\subsubsection* {State Invariant}
+
+None
+
+\subsubsection* {Assumptions}
+
+\begin{itemize}
+	\item The Grid2D constructor is called before any other access routine is called on that instance. Once a Grid2D has been created, the constructor will not be called on it again.
+	\item The initial state of the game is initialized through a text file and the user can manually change each point on the grid. To stay true to the view portion of the Model View Controller design pattern, the representation of the grid in the text file is a graphical one where a period "." represents a dead cell and a capital O "O" represents a a cell that is alive on the grid. The number or rows and columns can be changed as well.
+	\item Cells which are at the border of the grid do not have the number of their neighbours counted, that is, they are ignored.
+\end{itemize} 
+
+\subsubsection* {Access Routine Semantics}
+
+Grid2D($fileName$):
+\begin{itemize}
+\item transition: Reads the state of the grid from the environment variable initialState and use the graphical representation of the initial state of the grid to create a grid consisting of CellTypes which are either dead or alive.\\\\
+The test file initialState consists of an n x m grid where n and m can be modified. The graphical representation of a dead cell is a period ".", and the graphical representation of a cell which is alive is a capital O "O".
+\item exception: invalid\_argument when there is a problem opening the initialState text file to read. 
+\end{itemize}
+
+\noindent viewGrid($fileName$):
+\begin{itemize}
+\item transition: Writes to the environment variable nextState the graphical representation of the grid of CellTypes . Translates the grid consisting of CellTypes into its graphical representation. \\\\
+The text file nextState has the same format as initialState.
+\item exception: invalid\_argument when there is a problem opening the nextState text file to write. 
+\end{itemize}
+
+\noindent evolveGrid():
+\begin{itemize}
+\item transition:\\
+$ \forall $i, j: $ \mathbb{N} $ $|$ i $ \in [0..grid.size()]$, j $ \in [0..grid[i].size()] $: findNextState(grid[i][j])\\\\
+grid = temporaryStorage
+\item exception: None
+\end{itemize}
+
+\noindent viewGenerations(int n):
+\begin{itemize}
+\item transition \#procedural specification
+\begin{tabbing}
+	for i in \= range(n) \\
+	\> \= viewGrid() \\
+	\> \= evolveGrid()
+\end{tabbing}
+\item exceptions: None
+\end{itemize}
+
+\subsection*{Local Functions}
+\noindent countNeighbours(int row, int col):
+\begin{itemize}
+	
+	\item output: \#procedural specification
+	\begin{tabbing}
+		sum = 0\\
+		for i \=in range(-1..2)\\
+		\>for j \=in range(-1..2)\\
+		\>\>if(row\= + i $>$ 1 and row + i $<$ grid.size() and col + j $>$ -1 and col + j $<$ grid[0].size())\\
+		\>\>\>sum += grid[row + i][col + j]\\
+		sum -= grid[row][col]\\
+		return sum
+	\end{tabbing}
+
+	\item exceptions: None
+	
+\end{itemize}
+
+\noindent findNextState(int i, int j):
+\begin{itemize}
+	\item transition:\\\\
+	\begin{tabular}{| l | l | l |}
+		\hline
+		\textbf{Grid[i][j].s} & \textbf{countNeighbours(i, j)} & \textbf{temporaryStorage[i][j]} \\
+		\hline
+		Dead & 3 & CellT.s = Alive\\
+		\hline
+		Alive & $ \leq $ 3 & CellT.s = Alive\\
+		\hline
+		Alive & $ > $ 3 & CellT.s = Dead\\
+		\hline
+		Alive & $ < $ 2 & CellT.s = Dead\\
+		\hline
+		Dead & $!$ 3 & CellT.s = Dead\\
+		\hline
+	\end{tabular}
+	
+\end{itemize}
+
+\subsection*{Local Types}
+$ temporaryStorage $: seq of CellT
+\newpage
+
+\subsection*{Critique of design}
+
+I tried to stay as true to the model view controller design pattern when creating my design of the program as possible. Instead of creating a module which lets the user determine which cells should be alive and which cells should be dead through a program call, I decided to let the user modify the cells by modify the text file itself. I also decided to make the format of the text file containing the intial and final state of the grid to both bt a graphical representation of the grid as close to the one on https://bitstorm.org/gameoflife/ as I could make it using ascii characters. I kept the amount of access programs as small as possible and made sure that each access program is essential. That being said, viewGenerations is not essential since it can be done by a series of evolveGrid and viewGrid, but I included as a convenience to the user. In turn this also increases the principle of separation of concerns as the user does not have to worry about evolving the grid and viewing the grid at each stage of the game. The Grid2D ADT is very general since it is the only module I needed to create he game. I felt that another module to write to the file is not necessary but it would increase separation of concerns so I believe I would do that if I were to redesign my program. I also believe that the access routines in Grid2D are not as minimal as I could make them, but for the most part do only one specific task (with the exception of viewGenerations which evolves the grid and calls viewGrid). 
+
+\end {document}
